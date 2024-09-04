@@ -1,23 +1,87 @@
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background-color: #121212;
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
 }
 
 header {
-  background-color: #282c34;
+  text-align: center;
+  padding: 20px 0;
+  background-color: #1f1f1f;
+  border-bottom: 2px solid #333;
+}
+
+header h1 {
+  font-size: 2em;
+  margin: 0;
+  color: #e5e5e5;
+}
+
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px 0;
+  background-color: #1f1f1f;
+}
+
+.genres button {
+  background-color: #333;
+  color: #fff;
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.genres button:hover {
+  background-color: #555;
+}
+
+.previews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
   padding: 20px;
-  color: white;
+  background-color: #181818;
+}
+
+.preview-tile {
+  background-color: #1f1f1f;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.preview-tile:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.preview-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.preview-content {
+  padding: 15px;
   text-align: center;
 }
 
-button {
-  margin: 5px;
-  padding: 10px;
-  font-size: 1rem;
+h2 {
+  font-size: 1.1em;
+  margin: 10px 0;
 }
 
-div {
-  margin: 10px 0;
+p {
+  font-size: 0.9em;
+  color: #bbb;
+  margin: 5px 0;
 }
