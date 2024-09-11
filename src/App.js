@@ -9,6 +9,7 @@ function App() {
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedShow, setSelectedShow] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(''); // For search functionality
 
   useEffect(() => {
     fetch('https://podcast-api.netlify.app/shows')
@@ -39,29 +40,53 @@ function App() {
       });
   }, []);
 
+  // Handle clicking a show
   const handleShowClick = (id) => {
     fetch(`https://podcast-api.netlify.app/id/${id}`)
       .then(response => response.json())
       .then(data => setSelectedShow(data));
   };
 
-  const filteredShows = selectedGenre
-    ? shows.filter(show => show.genres.includes(selectedGenre))
-    : shows;
+  // Handle back button
+  const handleBackClick = () => {
+    setSelectedShow(null);
+  };
+
+  // Filter shows by genre and search query
+  const filteredShows = shows.filter(show => {
+    const matchesGenre = selectedGenre ? show.genres.includes(selectedGenre) : true;
+    const matchesSearch = show.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesGenre && matchesSearch;
+  });
 
   return (
     <div className="app">
       <header>
         <h1>Podcast App</h1>
       </header>
+      
+      <div className="search-bar">
+        <input 
+          type="text" 
+          placeholder="Search podcasts..." 
+          value={searchQuery} 
+          onChange={(e) => setSearchQuery(e.target.value)} 
+        />
+        <button onClick={() => setSearchQuery('')}>Clear</button>
+      </div>
+
       <div className="genres">
         {genres.map(genre => (
           <Genre key={genre.id} genre={genre} onClick={() => setSelectedGenre(genre.id)} />
         ))}
       </div>
+
       <div className="previews-grid">
         {selectedShow ? (
-          <Show show={selectedShow} />
+          <div>
+            <button className="back-button" onClick={handleBackClick}>Back</button>
+            <Show show={selectedShow} />
+          </div>
         ) : (
           filteredShows.map(show => (
             <Preview key={show.id} show={show} onClick={() => handleShowClick(show.id)} />
@@ -73,3 +98,4 @@ function App() {
 }
 
 export default App;
+
