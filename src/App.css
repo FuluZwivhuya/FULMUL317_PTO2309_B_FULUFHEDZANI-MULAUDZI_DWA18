@@ -76,11 +76,16 @@ header h1 {
 h2 {
   font-size: 1.1em;
   margin: 10px 0;
+  color: black;
+}
+
+h3 {
+  color: black;
 }
 
 p {
   font-size: 0.9em;
-  color: #bbb;
+  color: #0c0c0c;
   margin: 5px 0;
 }
 
@@ -113,7 +118,7 @@ p {
 }
 
 .back-button {
-  background-color:whitesmoke;
+  background-color:grey;
   color: black;
   border: none;
   padding: 10px 20px;
