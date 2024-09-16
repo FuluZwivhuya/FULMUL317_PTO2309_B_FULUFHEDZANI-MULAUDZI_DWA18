@@ -130,3 +130,18 @@ p {
 .back-button:hover {
   background-color: #555;
 }
+.carousel {
+  margin: 20px 0;
+}
+
+.slick-slide {
+  padding: 0 10px;
+}
+
+.slick-dots {
+  bottom: -30px;
+}
+
+
+
+

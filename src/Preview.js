@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 import './App.css';
 
 function Preview({ show, onClick }) {
@@ -21,7 +21,6 @@ function Preview({ show, onClick }) {
         <h2>{show.title}</h2>
         <p><strong>Season:</strong> {show.seasons}</p>
         <p><strong>Genres:</strong> {show.genres.map(id => genreMapping[id]).join(', ')}</p>
-        <p><strong>Updated:</strong> {new Date(show.updated).toLocaleDateString()}</p>
       </div>
     </div>
   );

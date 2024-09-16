@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import Preview from './Preview';
 import Show from './Show';
 import Genre from './Genre';
-import Fuse from 'fuse.js';
 import './App.css';
 
 function App() {
@@ -10,19 +9,24 @@ function App() {
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedShow, setSelectedShow] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  
+  const [searchQuery, setSearchQuery] = useState(''); // For search functionality
+  const [loading, setLoading] = useState(true); // Loading state for initial data
+  const [loadingNewShow, setLoadingNewShow] = useState(false); // Loading state for new show
+
   useEffect(() => {
     fetch('https://podcast-api.netlify.app/shows')
       .then(response => response.json())
       .then(data => {
         setShows(data);
+        setLoading(false); // Stop loading after data is fetched
+
         const allGenres = [];
         data.forEach(show => {
           show.genres.forEach(id => {
             if (!allGenres.includes(id)) allGenres.push(id);
           });
         });
+
         const genreMapping = {
           1: 'Personal Growth',
           2: 'True Crime and Investigative Journalism',
@@ -34,39 +38,33 @@ function App() {
           8: 'News',
           9: 'Kids and Family',
         };
+
         setGenres(allGenres.map(id => ({ id, title: genreMapping[id] })));
       });
   }, []);
 
-  // Sorting Functions
-  const sortByTitleAZ = () => {
-    const sortedShows = [...shows].sort((a, b) => a.title.localeCompare(b.title));
-    setShows(sortedShows);
+  // Handle clicking a show
+  const handleShowClick = (id) => {
+    setLoadingNewShow(true); // Start loading new show
+    fetch(`https://podcast-api.netlify.app/id/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        setSelectedShow(data);
+        setLoadingNewShow(false); // Stop loading new show
+      });
   };
 
-  const sortByTitleZA = () => {
-    const sortedShows = [...shows].sort((a, b) => b.title.localeCompare(a.title));
-    setShows(sortedShows);
+  // Handle back button
+  const handleBackClick = () => {
+    setSelectedShow(null);
   };
 
-  const sortByDateAsc = () => {
-    const sortedShows = [...shows].sort((a, b) => new Date(a.updated) - new Date(b.updated));
-    setShows(sortedShows);
-  };
-
-  const sortByDateDesc = () => {
-    const sortedShows = [...shows].sort((a, b) => new Date(b.updated) - new Date(a.updated));
-    setShows(sortedShows);
-  };
-
-  const fuse = new Fuse(shows, {
-    keys: ['title'],
-    threshold: 0.3,
+  // Filter shows by genre and search query
+  const filteredShows = shows.filter(show => {
+    const matchesGenre = selectedGenre ? show.genres.includes(selectedGenre) : true;
+    const matchesSearch = show.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesGenre && matchesSearch;
   });
-
-  const fuzzyFilteredShows = searchQuery 
-    ? fuse.search(searchQuery).map(result => result.item) 
-    : shows;  // If no search query, show all shows
 
   return (
     <div className="app">
@@ -84,13 +82,6 @@ function App() {
         <button onClick={() => setSearchQuery('')}>Clear</button>
       </div>
 
-      <div>
-        <button onClick={sortByTitleAZ}>Sort A-Z</button>
-        <button onClick={sortByTitleZA}>Sort Z-A</button>
-        <button onClick={sortByDateAsc}>Sort by Date Asc</button>
-        <button onClick={sortByDateDesc}>Sort by Date Desc</button>
-      </div>
-
       <div className="genres">
         {genres.map(genre => (
           <Genre key={genre.id} genre={genre} onClick={() => setSelectedGenre(genre.id)} />
@@ -98,14 +89,20 @@ function App() {
       </div>
 
       <div className="previews-grid">
-        {selectedShow ? (
+        {loading ? ( // Loading state for initial data
+          <p>Loading podcasts...</p>
+        ) : selectedShow ? (
           <div>
-            <button className="back-button" onClick={() => setSelectedShow(null)}>Back</button>
-            <Show show={selectedShow} />
+            <button className="back-button" onClick={handleBackClick}>Back</button>
+            {loadingNewShow ? ( // Loading state for new show
+              <p>Loading show details...</p>
+            ) : (
+              <Show show={selectedShow} />
+            )}
           </div>
         ) : (
-          fuzzyFilteredShows.map(show => (
-            <Preview key={show.id} show={show} onClick={() => setSelectedShow(show.id)} />
+          filteredShows.map(show => (
+            <Preview key={show.id} show={show} onClick={() => handleShowClick(show.id)} />
           ))
         )}
       </div>
@@ -114,4 +111,3 @@ function App() {
 }
 
 export default App;
-
