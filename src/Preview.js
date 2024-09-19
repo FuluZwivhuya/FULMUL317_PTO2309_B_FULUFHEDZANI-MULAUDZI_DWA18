@@ -1,4 +1,4 @@
-import React from 'react'; 
+import React from 'react';
 import './App.css';
 
 function Preview({ show, onClick }) {
@@ -19,7 +19,7 @@ function Preview({ show, onClick }) {
       <img className="preview-image" src={show.image} alt={show.title} />
       <div className="preview-content">
         <h2>{show.title}</h2>
-        <p><strong>Season:</strong> {show.seasons}</p>
+        <p><strong>Seasons:</strong> {show.seasons.length}</p>
         <p><strong>Genres:</strong> {show.genres.map(id => genreMapping[id]).join(', ')}</p>
       </div>
     </div>

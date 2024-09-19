@@ -1,11 +1,7 @@
 import React from 'react';
 
 function Episode({ episode }) {
-  
-  console.log('Episode data:', episode);
-
-
-  const audioFile = episode.file || 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
+  const audioFile = episode.file || 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
   return (
     <div>

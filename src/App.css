@@ -28,7 +28,7 @@ header h1 {
 }
 
 .genres button {
-  background-color:grey;
+  background-color: grey;
   color: #fff;
   margin: 5px;
   padding: 10px 20px;
@@ -59,7 +59,7 @@ header h1 {
 
 .preview-tile:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgb(126, 107, 72) (0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(126, 107, 72), 0 0 0.3 rgba(0, 0, 0, 0.3);
 }
 
 .preview-image {
@@ -101,8 +101,8 @@ p {
   padding: 10px;
   border: 1px solid #555;
   margin-right: 10px;
-  background-color:whitesmoke;
-  color:black;
+  background-color: whitesmoke;
+  color: black;
 }
 
 .search-bar button {
@@ -117,8 +117,28 @@ p {
   background-color: #777;
 }
 
+.sort-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  background-color: grey;
+}
+
+.sort-bar label {
+  margin-right: 10px;
+  color: whitesmoke;
+}
+
+.sort-bar select {
+  padding: 10px;
+  border: 1px solid #555;
+  background-color: whitesmoke;
+  color: black;
+}
+
 .back-button {
-  background-color:grey;
+  background-color: grey;
   color: black;
   border: none;
   padding: 10px 20px;
@@ -130,18 +150,3 @@ p {
 .back-button:hover {
   background-color: #555;
 }
-.carousel {
-  margin: 20px 0;
-}
-
-.slick-slide {
-  padding: 0 10px;
-}
-
-.slick-dots {
-  bottom: -30px;
-}
-
-
-
-

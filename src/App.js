@@ -9,19 +9,19 @@ function App() {
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedShow, setSelectedShow] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(''); // For search functionality
-  const [loading, setLoading] = useState(true); // Loading state for initial data
-  const [loadingNewShow, setLoadingNewShow] = useState(false); // Loading state for new show
+  const [searchQuery, setSearchQuery] = useState(''); 
+  const [loading, setLoading] = useState(true); 
+  const [sortOrder, setSortOrder] = useState('');
 
   useEffect(() => {
     fetch('https://podcast-api.netlify.app/shows')
       .then(response => response.json())
       .then(data => {
-        setShows(data);
-        setLoading(false); // Stop loading after data is fetched
+        setShows(data || []);
+        setLoading(false);
 
         const allGenres = [];
-        data.forEach(show => {
+        data?.forEach(show => {
           show.genres.forEach(id => {
             if (!allGenres.includes(id)) allGenres.push(id);
           });
@@ -40,31 +40,43 @@ function App() {
         };
 
         setGenres(allGenres.map(id => ({ id, title: genreMapping[id] })));
+      })
+      .catch(error => {
+        console.error('Error fetching shows:', error);
+        setLoading(false);
       });
   }, []);
 
-  // Handle clicking a show
   const handleShowClick = (id) => {
-    setLoadingNewShow(true); // Start loading new show
     fetch(`https://podcast-api.netlify.app/id/${id}`)
       .then(response => response.json())
       .then(data => {
-        setSelectedShow(data);
-        setLoadingNewShow(false); // Stop loading new show
+        setSelectedShow(data || {});
+      })
+      .catch(error => {
+        console.error('Error fetching show:', error);
       });
   };
 
-  // Handle back button
   const handleBackClick = () => {
     setSelectedShow(null);
   };
 
-  // Filter shows by genre and search query
-  const filteredShows = shows.filter(show => {
+  let filteredShows = shows?.filter(show => {
     const matchesGenre = selectedGenre ? show.genres.includes(selectedGenre) : true;
     const matchesSearch = show.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesGenre && matchesSearch;
   });
+
+  if (sortOrder === 'title-asc') {
+    filteredShows.sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sortOrder === 'title-desc') {
+    filteredShows.sort((a, b) => b.title.localeCompare(a.title));
+  } else if (sortOrder === 'date-asc') {
+    filteredShows.sort((a, b) => new Date(a.updated) - new Date(b.updated));
+  } else if (sortOrder === 'date-desc') {
+    filteredShows.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+  }
 
   return (
     <div className="app">
@@ -88,20 +100,31 @@ function App() {
         ))}
       </div>
 
+      <div className="sort-bar">
+        <label htmlFor="sortOrder">Sort by:</label>
+        <select
+          id="sortOrder"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
+          <option value="">Select</option>
+          <option value="title-asc">Title A-Z</option>
+          <option value="title-desc">Title Z-A</option>
+          <option value="date-asc">Date Updated Ascending</option>
+          <option value="date-desc">Date Updated Descending</option>
+        </select>
+      </div>
+
       <div className="previews-grid">
-        {loading ? ( // Loading state for initial data
+        {loading ? ( 
           <p>Loading podcasts...</p>
         ) : selectedShow ? (
           <div>
-            <button className="back-button" onClick={handleBackClick}>Back</button>
-            {loadingNewShow ? ( // Loading state for new show
-              <p>Loading show details...</p>
-            ) : (
-              <Show show={selectedShow} />
-            )}
+            <button className="back-button" onClick={handleBackClick}>Back to Shows</button>
+            <Show show={selectedShow} />
           </div>
         ) : (
-          filteredShows.map(show => (
+          filteredShows?.map(show => (
             <Preview key={show.id} show={show} onClick={() => handleShowClick(show.id)} />
           ))
         )}

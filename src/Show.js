@@ -16,7 +16,7 @@ function Show({ show }) {
     <div>
       {selectedSeason ? (
         <div>
-          <button className="back-button" onClick={handleBackClick}>Back to Show</button> {/* Back button */}
+          <button className="back-button" onClick={handleBackClick}>Back to Show</button>
           <Season season={selectedSeason} />
         </div>
       ) : (
@@ -24,19 +24,18 @@ function Show({ show }) {
           <h2>{show.title}</h2>
           <p>{show.description}</p>
           <div className="seasons-toggle">
-          {show.seasons.map((season, index) => (
-  <button 
-    key={season.id || index} 
-    onClick={() => handleSeasonClick(season)}
-    style={{ 
-      backgroundColor: season === selectedSeason ? '#555' : 'whitesmoke', 
-      color: season === selectedSeason ? 'white' : 'black' 
-    }}
-  >
-    Season {season.number}
-  </button>
-))}
-
+            {show.seasons.map((season, index) => (
+              <button 
+                key={season.id || index} 
+                onClick={() => handleSeasonClick(season)}
+                style={{ 
+                  backgroundColor: season === selectedSeason ? '#555' : 'whitesmoke', 
+                  color: season === selectedSeason ? 'white' : 'black' 
+                }}
+              >
+                Season {season.number}
+              </button>
+            ))}
           </div>
         </div>
       )}
