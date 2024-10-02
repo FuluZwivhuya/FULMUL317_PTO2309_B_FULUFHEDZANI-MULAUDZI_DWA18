@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Preview from './Preview';
 import Show from './Show';
 import Genre from './Genre';
+import Favourites from './Favourites'; 
 import './App.css';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState(''); 
   const [loading, setLoading] = useState(true); 
   const [sortOrder, setSortOrder] = useState('');
+  const [favorites, setFavorites] = useState([]); 
 
   useEffect(() => {
     fetch('https://podcast-api.netlify.app/shows')
@@ -60,6 +62,18 @@ function App() {
 
   const handleBackClick = () => {
     setSelectedShow(null);
+  };
+
+  const handleToggleFavorite = (episode) => {
+    setFavorites((prevFavorites) => {
+      if (prevFavorites.some(fav => fav.id === episode.id)) {
+        // Remove from favorites
+        return prevFavorites.filter(fav => fav.id !== episode.id);
+      } else {
+        // Add to favorites
+        return [...prevFavorites, episode];
+      }
+    });
   };
 
   let filteredShows = shows?.filter(show => {
@@ -121,7 +135,7 @@ function App() {
         ) : selectedShow ? (
           <div>
             <button className="back-button" onClick={handleBackClick}>Back to Shows</button>
-            <Show show={selectedShow} />
+            <Show show={selectedShow} onToggleFavorite={handleToggleFavorite} />
           </div>
         ) : (
           filteredShows?.map(show => (
@@ -129,6 +143,8 @@ function App() {
           ))
         )}
       </div>
+
+      <Favourites favorites={favorites} onToggleFavorite={handleToggleFavorite} />
     </div>
   );
 }
