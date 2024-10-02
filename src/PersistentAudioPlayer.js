@@ -1,73 +1,79 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-function PersistentAudioPlayer({ episode, onEnded }) {
-  const [currentTime, setCurrentTime] = useState(() => loadProgress(episode.id) || 0);
-  const [duration, setDuration] = useState(0);
+function PersistentAudioPlayer({ currentEpisode }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0); // Stores the current playback position
   const audioRef = useRef(null);
 
-  const handleTimeUpdate = (e) => {
-    setCurrentTime(e.target.currentTime);
-    setDuration(e.target.duration);
-  };
-
-  const saveProgress = (episodeId, currentTime) => {
-    const progress = JSON.parse(localStorage.getItem('progress')) || {};
-    progress[episodeId] = currentTime;
-    localStorage.setItem('progress', JSON.stringify(progress));
-  };
-
-  const loadProgress = (episodeId) => {
-    const progress = JSON.parse(localStorage.getItem('progress')) || {};
-    return progress[episodeId] || 0;
-  };
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
-
-  const handleBeforeUnload = (e) => {
-    if (audioRef.current && !audioRef.current.paused) {
-      e.preventDefault();
-      e.returnValue = '';
+  // Load saved progress from localStorage if available
+  useEffect(() => {
+    const savedProgress = localStorage.getItem(`progress-${currentEpisode?.id}`);
+    if (savedProgress) {
+      setProgress(parseFloat(savedProgress));
     }
-  };
+  }, [currentEpisode]);
 
+  // Update progress when playing
   useEffect(() => {
-    saveProgress(episode.id, currentTime);
-  }, [currentTime, episode.id]);
+    const audioElement = audioRef.current; // Capture the current audio element
+    if (audioElement) {
+      audioElement.currentTime = progress;
+    }
 
-  useEffect(() => {
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+    const handleTimeUpdate = () => {
+      setProgress(audioElement.currentTime);
     };
-  }, []);
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = currentTime;
+    if (audioElement) {
+      audioElement.addEventListener('timeupdate', handleTimeUpdate);
     }
-  }, [currentTime]);
+
+    return () => {
+      // Use the captured value in the cleanup
+      if (audioElement) {
+        audioElement.removeEventListener('timeupdate', handleTimeUpdate);
+      }
+    };
+  }, [progress]);
+
+  // Save progress in localStorage on pause or stop
+  const handlePause = () => {
+    setIsPlaying(false);
+    localStorage.setItem(`progress-${currentEpisode.id}`, audioRef.current.currentTime);
+  };
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+    audioRef.current.play();
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    localStorage.setItem(`progress-${currentEpisode.id}`, 0); // Reset progress on completion
+  };
 
   return (
     <div className="audio-player">
-      <p>{episode.title}</p>
-      <audio 
-        ref={audioRef}
-        controls 
-        src={episode.file}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={onEnded}
-      >
-        Your browser does not support the audio element.
-      </audio>
-      <div className="progress">
-        <span>{formatTime(currentTime)}</span> / <span>{formatTime(duration)}</span>
-      </div>
+      {currentEpisode ? (
+        <>
+          <p>Now playing: {currentEpisode.title}</p>
+          <audio
+            ref={audioRef}
+            src={currentEpisode.audioUrl}
+            onPause={handlePause}
+            onEnded={handleEnded}
+            controls
+          />
+          <button onClick={isPlaying ? () => audioRef.current.pause() : handlePlay}>
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+        </>
+      ) : (
+        <p>No episode selected</p>
+      )}
     </div>
   );
 }
 
 export default PersistentAudioPlayer;
+

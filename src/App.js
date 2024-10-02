@@ -3,6 +3,7 @@ import Preview from './Preview';
 import Show from './Show';
 import Genre from './Genre';
 import Favourites from './Favourites'; 
+import PersistentAudioPlayer from './PersistentAudioPlayer'; // Import the new audio player
 import './App.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
   const [loading, setLoading] = useState(true); 
   const [sortOrder, setSortOrder] = useState('');
   const [favorites, setFavorites] = useState([]); 
+  const [currentEpisode, setCurrentEpisode] = useState(null); // For the audio player
 
   useEffect(() => {
     fetch('https://podcast-api.netlify.app/shows')
@@ -67,13 +69,17 @@ function App() {
   const handleToggleFavorite = (episode) => {
     setFavorites((prevFavorites) => {
       if (prevFavorites.some(fav => fav.id === episode.id)) {
-        // Remove from favorites
+        // Remove favorites
         return prevFavorites.filter(fav => fav.id !== episode.id);
       } else {
-        // Add to favorites
+        // Add favorites
         return [...prevFavorites, episode];
       }
     });
+  };
+
+  const handleEpisodePlay = (episode) => {
+    setCurrentEpisode(episode); // Set the current episode for the audio player
   };
 
   let filteredShows = shows?.filter(show => {
@@ -135,7 +141,7 @@ function App() {
         ) : selectedShow ? (
           <div>
             <button className="back-button" onClick={handleBackClick}>Back to Shows</button>
-            <Show show={selectedShow} onToggleFavorite={handleToggleFavorite} />
+            <Show show={selectedShow} onToggleFavorite={handleToggleFavorite} onPlayEpisode={handleEpisodePlay} />
           </div>
         ) : (
           filteredShows?.map(show => (
@@ -145,6 +151,9 @@ function App() {
       </div>
 
       <Favourites favorites={favorites} onToggleFavorite={handleToggleFavorite} />
+
+      {/* Add PersistentAudioPlayer to the app */}
+      <PersistentAudioPlayer currentEpisode={currentEpisode} />
     </div>
   );
 }
